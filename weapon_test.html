@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兵器馆 · 军事天赋测试</title>
+    <style>
+        /* 基础样式 - 模仿简洁专业的问卷风格 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            border-radius: 10px;
+        }
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: none; /* 初始隐藏，通过JS控制显示 */
+        }
+        .question-card.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .option {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            background-color: #f0f8ff;
+            border-color: #3498db;
+        }
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #1a73e8;
+            font-weight: bold;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #1a2980;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #26d0ce;
+        }
+        #result {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .result-title {
+            color: #1a2980;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .result-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #26d0ce, #1a2980);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- 测试页面主体 -->
+    <div class="header">
+        <h1>兵器馆 · 军事天赋测试</h1>
+        <p>完成以下4道题，解锁你的专属军事代号与馆内挑战书！</p>
+        <div class="progress-bar">
+            <div class="progress" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- 题目1 -->
+    <div class="question-card active" id="q1">
+        <div class="question-text">1. 在团队游戏中，你更习惯扮演什么角色？</div>
+        <div class="option" data-value="A" data-q="1">A. 冲锋在前的突击手 – 享受一马当先、打开局面的快感。</div>
+        <div class="option" data-value="B" data-q="1">B. 运筹帷幄的指挥员 – 擅长分析局势，为团队指明方向。</div>
+    </div>
+    <!-- 题目2 -->
+    <div class="question-card" id="q2">
+        <div class="question-text">2. 接到一个任务时，哪种完成方式更让你有成就感？</div>
+        <div class="option" data-value="A" data-q="2">A. 力量执行 – 依靠强大的工具或自身力量，正面突破。</div>
+        <div class="option" data-value="B" data-q="2">B. 精巧破解 – 寻找关键节点，用精准巧妙的方式解决。</div>
+    </div>
+    <!-- 题目3 -->
+    <div class="question-card" id="q3">
+        <div class="question-text">3. 当突然面对一个高速袭来的挑战时，你的第一反应更接近？</div>
+        <div class="option" data-value="A" data-q="3">A. 构筑防线 – 迅速采取防御姿态，稳住阵脚。</div>
+        <div class="option" data-value="B" data-q="3">B. 瞄准反击 – 立即锁定目标，思考如何一击制胜。</div>
+    </div>
+    <!-- 题目4 -->
+    <div class="question-card" id="q4">
+        <div class="question-text">4. 哪种科技产品更让你着迷？</div>
+        <div class="option" data-value="A" data-q="4">A. 重型机械 – 迷恋其磅礴的力量与复杂的结构。</div>
+        <div class="option" data-value="B" data-q="4">B. 智能装置 – 痴迷于其自主决策和精准协作的能力。</div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <div style="text-align: center;">
+        <button class="btn" id="prevBtn" style="display:none;">上一题</button>
+        <button class="btn" id="nextBtn">下一题</button>
+        <button class="btn" id="submitBtn" style="display:none;">生成我的挑战书</button>
+    </div>
+
+    <!-- 结果展示区域 -->
+    <div id="result">
+        <!-- 结果内容将通过JavaScript动态生成 -->
+    </div>
+
+    <script>
+        // 1. 初始化变量
+        let currentQuestion = 1;
+        const totalQuestions = 4;
+        let answers = ['', '', '', '']; // 存储答案，例如 ['A', 'B', 'A', 'B']
+
+        // 2. 结果映射表 (16种组合 -> 4大阵营)
+        // 这是您之前讨论的严格映射逻辑：以第一题（A/B）分两大阵营，后三题决定细分称号
+        const resultMap = {
+            // 【钢铁先锋】阵营 (第一题为A)
+            'AAAA': { title: '重装突破手', type: '钢铁先锋', desc: '你是纯粹的力量崇拜者，崇尚用绝对实力正面碾压一切障碍。', task: '主场：机动突击区。挑战：必须征服坦克模拟驾驶舱，并与最重型的主战坦克合影。' },
+            'AAAB': { title: '重装突破手', type: '钢铁先锋', desc: '你是纯粹的力量崇拜者，崇尚用绝对实力正面碾压一切障碍。', task: '主场：机动突击区。挑战：必须征服坦克模拟驾驶舱，并与最重型的主战坦克合影。' },
+            'AABA': { title: '战术尖兵', type: '钢铁先锋', desc: '你是善于利用科技利器的突击手，兼具勇猛与巧思。', task: '主场：智能弹药区。挑战：研究巡飞弹如何支援突击，并尝试轻武器模拟射击。' },
+            'AABB': { title: '战术尖兵', type: '钢铁先锋', desc: '你是善于利用科技利器的突击手，兼具勇猛与巧思。', task: '主场：智能弹药区。挑战：研究巡飞弹如何支援突击，并尝试轻武器模拟射击。' },
+            'ABAA': { title: '坚韧守护者', type: '钢铁先锋', desc: '你是突击阵线上的坚固盾牌，善于在冲锋中为队友提供掩护。', task: '主场：末端防御区。挑战：学习防空系统原理，体验协同防空操作。' },
+            'ABAB': { title: '坚韧守护者', type: '钢铁先锋', desc: '你是突击阵线上的坚固盾牌，善于在冲锋中为队友提供掩护。', task: '主场：末端防御区。挑战：学习防空系统原理，体验协同防空操作。' },
+            'ABBA': { title: '战场工程师', type: '钢铁先锋', desc: '你是攻坚克难的专家，擅长为突击部队扫清技术性障碍。', task: '主场：破甲攻坚区。挑战：搞懂一种反坦克武器原理，并观察重型装备结构。' },
+            'ABBB': { title: '战场工程师', type: '钢铁先锋', desc: '你是攻坚克难的专家，擅长为突击部队扫清技术性障碍。', task: '主场：破甲攻坚区。挑战：搞懂一种反坦克武器原理，并观察重型装备结构。' },
+            // 【苍穹智瞳】阵营 (第一题为B)
+            'BAAA': { title: '战地工程师', type: '苍穹智瞳', desc: '你是善于构筑防线、提供坚实后援的守护大脑。', task: '主场：末端防御区。挑战：彻底搞懂一种防空系统原理，研究防护之道。' },
+            'BAAB': { title: '战地工程师', type: '苍穹智瞳', desc: '你是善于构筑防线、提供坚实后援的守护大脑。', task: '主场：末端防御区。挑战：彻底搞懂一种防空系统原理，研究防护之道。' },
+            'BABA': { title: '战略侦察者', type: '苍穹智瞳', desc: '你是洞察全局、善用智能科技决胜千里的战场先知。', task: '主场：智能弹药区。挑战：对比3种无人机的不同用途，尝试模拟操控。' },
+            'BABB': { title: '战略侦察者', type: '苍穹智瞳', desc: '你是洞察全局、善用智能科技决胜千里的战场先知。', task: '主场：智能弹药区。挑战：对比3种无人机的不同用途，尝试模拟操控。' },
+            'BBAA': { title: '精密计算师', type: '苍穹智瞳', desc: '你是追求极致精准的谋士，信奉“一发入魂”的效率美学。', task: '主场：火力打击区。挑战：研究远程精确制导原理，在模拟射击中追求最高环数。' },
+            'BBAB': { title: '精密计算师', type: '苍穹智瞳', desc: '你是追求极致精准的谋士，信奉“一发入魂”的效率美学。', task: '主场：火力打击区。挑战：研究远程精确制导原理，在模拟射击中追求最高环数。' },
+            'BBBA': { title: '全域指挥官', type: '苍穹智瞳', desc: '你是天生的统帅，善于整合多维度信息，制定最优战略。', task: '主场：全馆协同。挑战：体验协同作战模拟，制定一份涵盖三个展区的联合作战参观路线。' },
+            'BBBB': { title: '全域指挥官', type: '苍穹智瞳', desc: '你是天生的统帅，善于整合多维度信息，制定最优战略。', task: '主场：全馆协同。挑战：体验协同作战模拟，制定一份涵盖三个展区的联合作战参观路线。' }
+        };
+
+        // 3. 核心交互函数
+        function updateProgress() {
+            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        function showQuestion(n) {
+            // 隐藏所有题目
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            // 显示当前题目
+            document.getElementById(`q${n}`).classList.add('active');
+            // 更新按钮状态
+            document.getElementById('prevBtn').style.display = (n === 1) ? 'none' : 'inline-block';
+            document.getElementById('nextBtn').style.display = (n === totalQuestions) ? 'none' : 'inline-block';
+            document.getElementById('submitBtn').style.display = (n === totalQuestions) ? 'inline-block' : 'none';
+            updateProgress();
+        }
+        // 4. 为选项绑定点击事件
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const qIndex = parseInt(this.getAttribute('data-q')) - 1;
+                const value = this.getAttribute('data-value');
+                answers[qIndex] = value;
+                // 清除同题其他选项的选中状态
+                document.querySelectorAll(`.option[data-q="${qIndex + 1}"]`).forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                // 选中当前选项
+                this.classList.add('selected');
+            });
+        });
+        // 5. 按钮事件
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (answers[currentQuestion - 1] === '') {
+                alert('请先选择当前题的答案！');
+                return;
+            }
+            if (currentQuestion < totalQuestions) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        });
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentQuestion > 1) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const answerKey = answers.join(''); // 组合成如 "AABA"
+            const result = resultMap[answerKey];
+            if (result) {
+                // 动态生成结果页
+                document.getElementById('result').innerHTML = `
+                    <h2 class="result-title">你的军事天赋是：${result.title}</h2>
+                    <p><strong>阵营</strong>：${result.type}</p>
+                    <p>${result.desc}</p>
+                    <h3>🏆 你的兵器馆专属挑战书</h3>
+                    <p>${result.task}</p>
+                    <p><strong>行动指令</strong>：凭此称号前往兵器馆，完成以上挑战并拍照打卡！</p>
+                    <button class="btn" onclick="window.location.reload()">重新测试</button>
+                `;
+                document.getElementById('result').style.display = 'block';
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } else {
+                alert('结果计算错误，请确保已回答所有问题。');
+            }
+        });
+        // 初始化显示第一题
+        showQuestion(1);
+    </script>
+</body>
+</html>
